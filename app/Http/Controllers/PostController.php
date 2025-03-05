@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -21,6 +22,10 @@ class PostController extends Controller
      */
     public function create()
     {
+        // Gate::authorize('create-post');
+        if(Gate::denies('create-post')){
+            abort(403);
+        }
         return view('posts.create');
     }
 
@@ -29,6 +34,9 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        if(!Gate::allows('create-post')){
+            abort(403);
+        }
         $validated=$request->validate([
             'title'=>['required','max:255']
         ]);
@@ -52,7 +60,11 @@ class PostController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $post=Post::findOrFail($id);
+        if(Gate::denies('update-post',$post)){
+            abort(403);
+        }
+        return view('posts.edit',compact('post'));
     }
 
     /**
@@ -60,7 +72,15 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $post=Post::findOrFail($id);
+        if(!Gate::allows('update-post',$post)){
+            abort(403);
+        }
+        $validated=$request->validate([
+            'title'=>['required','max:255']
+        ]);
+        $post->update($validated);
+        return redirect()->route('home')->with('success','Success update');
     }
 
     /**
@@ -68,6 +88,11 @@ class PostController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // if(Gate::denies('delete-post')){
+        //     abort(403);
+        // }
+        $post=Post::findOrFail($id);
+        $post->delete();
+        return redirect()->route('home')->with('success','Success delete');
     }
 }
