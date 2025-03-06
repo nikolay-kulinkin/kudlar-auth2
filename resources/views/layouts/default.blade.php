@@ -25,7 +25,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('logout')}}">Logout</a>
                     </li>
-                    @can('create-post')
+                    @cannot('create',Post::class)
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('posts.create')}}">New post</a>
                     </li>

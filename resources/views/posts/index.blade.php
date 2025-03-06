@@ -9,10 +9,10 @@
     <div class="mb-3">
         <h3>{{$post->title}}</h3>
         Author:{{$post->user->name}}
-        @can('update-post',$post)
+        @can('update',$post)
         |<a href="{{route('posts.edit',$post)}}" class="text-primary">Edit</a>
         @endcan
-        @can('delete-post')
+        @can('delete',$post)
         <form action="{{route('posts.destroy',$post)}}" method="post">
             @csrf
             @method('DELETE')
